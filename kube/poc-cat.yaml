@@ -23,6 +23,7 @@ spec:
         run: poc-cat
     spec:
       imagePullSecrets:
+      # secret created using this command : kubectl create secret docker-registry hub-ricardogroup --docker-server=index.docker.io --docker-username=johndoe --docker-password=toto --docker-email=xxx --namespace testing
       - name: hub-ricardogroup
       containers:
       # - image: index.docker.io/chricardo/cat:latest
