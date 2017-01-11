@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: testing
+  labels:
+    name: testing
+---
+apiVersion: extensions/v1beta1  # required for "Deployment" kind
+kind: Deployment
+metadata:
+  namespace: testing
+  labels:
+    run: poc-cat
+  name: poc-cat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: poc-cat
+  template:
+    metadata:
+      labels:
+        run: poc-cat
+    spec:
+      imagePullSecrets:
+      - name: hub-ricardogroup
+      containers:
+      # - image: index.docker.io/chricardo/cat:latest
+      - image: index.docker.io/ricardogroup/pe-demo-python
+        imagePullPolicy: IfNotPresent
+        name: poc-cat
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+          name: maow-port
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: testing
+  labels:
+    run: poc-cat
+  name: poc-cat
+  annotations:
+    prometheus.io/scrape: "true" # make metrics scraped from this target
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: maow-port   # refers to exposed 8080 port from the container defined below
+  selector:
+    run: poc-cat
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cat-ingress
+  namespace: testing
+spec:
+  rules:
+  - host: next.ricardo.ch
+    http:
+      paths:
+      - path: /cat
+        backend:
+          serviceName: poc-cat
+          servicePort: http
