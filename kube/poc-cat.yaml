@@ -26,7 +26,7 @@ spec:
       - name: hub-ricardogroup
       containers:
       # - image: index.docker.io/chricardo/cat:latest
-      - image: index.docker.io/ricardogroup/pe-demo-python
+      - image: index.docker.io/ricardogroup/pe-demo-python   # waiting for a real 'cat' container
         imagePullPolicy: IfNotPresent
         name: poc-cat
         ports:
